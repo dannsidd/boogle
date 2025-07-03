@@ -75,7 +75,12 @@
       background: linear-gradient(90deg, #0072ff 0%, #00c6ff 100%);
     }
 
-    /* For mobile */
+    .message {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #d4f1ff;
+    }
+
     @media (max-width: 480px) {
       .search-container {
         flex-direction: column;
@@ -95,55 +100,75 @@
   <h1>Boogle</h1>
 
   <div class="search-container">
-    <form id="boogleForm" action="https://formspree.io/f/xldnvweb" method="POST">
-      <input type="text" name="searchQuery" placeholder="Type your search here..." required />
-      <!-- Hidden inputs for timestamp -->
-      <input type="hidden" name="day" id="day" />
-      <input type="hidden" name="date" id="date" />
-      <input type="hidden" name="time" id="time" />
-      <input type="hidden" name="month" id="month" />
+    <form id="boogleForm">
+      <input type="text" name="searchQuery" id="searchInput" placeholder="Type your search here..." required />
       <button type="submit">Search</button>
     </form>
   </div>
 
-  <script>
-    // Function to format date info and put into hidden inputs before submit
-    const form = document.getElementById('boogleForm');
+  <div class="message" id="msgBox"></div>
 
-    form.addEventListener('submit', (e) => {
+  <script>
+    const form = document.getElementById('boogleForm');
+    const searchInput = document.getElementById('searchInput');
+    const msgBox = document.getElementById('msgBox');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent default form action
+
+      const searchQuery = searchInput.value;
+
+      if (!searchQuery.trim()) {
+        msgBox.textContent = "Please enter a search query.";
+        return;
+      }
+
       const now = new Date();
 
-      // Day as string (e.g., Wednesday)
       const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const day = dayNames[now.getDay()];
-
-      // Date number
-      const date = now.getDate();
-
-      // Month as string (e.g., July)
       const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June', 
+        'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
       ];
-      const month = monthNames[now.getMonth()];
 
-      // Time formatted HH:MM:SS AM/PM
+      const day = dayNames[now.getDay()];
+      const date = now.getDate();
+      const month = monthNames[now.getMonth()];
       let hours = now.getHours();
       const minutes = now.getMinutes().toString().padStart(2, '0');
       const seconds = now.getSeconds().toString().padStart(2, '0');
       const ampm = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12;
-      hours = hours ? hours : 12; // 0 -> 12
+      hours = hours ? hours : 12;
 
       const time = `${hours}:${minutes}:${seconds} ${ampm}`;
 
-      // Set hidden inputs
-      document.getElementById('day').value = day;
-      document.getElementById('date').value = date;
-      document.getElementById('month').value = month;
-      document.getElementById('time').value = time;
-
-      // The form will submit normally afterward
+      // Send data via fetch to Formspree
+      fetch('https://formspree.io/f/xldnvweb', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          searchQuery,
+          day,
+          date,
+          month,
+          time
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          msgBox.textContent = `Searching for "${searchQuery}"...`;
+          searchInput.value = '';
+        } else {
+          msgBox.textContent = "Oops! Something went wrong.";
+        }
+      })
+      .catch(() => {
+        msgBox.textContent = "Error: Unable to submit data.";
+      });
     });
   </script>
 
