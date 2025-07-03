@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Boogle - The Premium Search</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    }
+
+    .search-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 25px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 14px 20px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 50px;
+      outline: none;
+      color: #333;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 4px 20px rgba(0,123,255,0.6);
+    }
+
+    button {
+      background: #00c6ff;
+      background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(0, 114, 255, 0.5);
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #0072ff 0%, #00c6ff 100%);
+    }
+
+    /* For mobile */
+    @media (max-width: 480px) {
+      .search-container {
+        flex-direction: column;
+      }
+      input[type="text"] {
+        width: 100%;
+      }
+      button {
+        width: 100%;
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Boogle</h1>
+
+  <div class="search-container">
+    <form id="boogleForm" action="https://formspree.io/f/xldnvweb" method="POST">
+      <input type="text" name="searchQuery" placeholder="Type your search here..." required />
+      <!-- Hidden inputs for timestamp -->
+      <input type="hidden" name="day" id="day" />
+      <input type="hidden" name="date" id="date" />
+      <input type="hidden" name="time" id="time" />
+      <input type="hidden" name="month" id="month" />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <script>
+    // Function to format date info and put into hidden inputs before submit
+    const form = document.getElementById('boogleForm');
+
+    form.addEventListener('submit', (e) => {
+      const now = new Date();
+
+      // Day as string (e.g., Wednesday)
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const day = dayNames[now.getDay()];
+
+      // Date number
+      const date = now.getDate();
+
+      // Month as string (e.g., July)
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      const month = monthNames[now.getMonth()];
+
+      // Time formatted HH:MM:SS AM/PM
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0 -> 12
+
+      const time = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+      // Set hidden inputs
+      document.getElementById('day').value = day;
+      document.getElementById('date').value = date;
+      document.getElementById('month').value = month;
+      document.getElementById('time').value = time;
+
+      // The form will submit normally afterward
+    });
+  </script>
+
+</body>
+</html>
